@@ -8,8 +8,8 @@ app = typer.Typer(invoke_without_command=True)
 
 @app.callback()
 def main(
-    host: str = "127.0.0.1",
-    port: int = 8081,
+    host: str = os.environ.get('AUTOGENUI_HOST', '127.0.0.1'),
+    port: int = int(os.environ.get('AUTOGENUI_PORT', '8081')),
     workers: int = 1,
     reload: Annotated[bool, typer.Option("--reload")] = False,
     docs: bool = False,

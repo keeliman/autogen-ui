@@ -1,8 +1,14 @@
 # Utilisez une image de base Python 3.9
 FROM python:3.9-slim
 
+# Env variables
+ENV AUTOGENUI_HOST=0.0.0.0
+ENV AUTOGENUI_PORT=8081
+
 # Définissez le répertoire de travail dans le conteneur
 WORKDIR /app
+
+RUN OPENAI_API_KEY=XXX
 
 # Copiez les fichiers locaux dans le conteneur
 COPY . .
