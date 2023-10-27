@@ -1,3 +1,21 @@
+To use When you tux outside<br>
+___________________________________
+EU.MEC.EU wafu-wafu ( @caisse de bruck )<br>
+mekua-meke-suku SAV@dir.eu
+____________________________________
+
+## Fork of AUTOGEN UI 
+
+Configured for Docker 
+
+build 
+```bash
+docker build -t autogensimple-ui:latest .
+```
+Run 
+```bash
+docker run -it --name AutogenSIMP_UI -p 8081:8081 autogensimple-ui:latest
+```
 # AutoGen UI
 
 ![AutoGen UI Screenshot](docs/images/autogenuiscreen.png)
