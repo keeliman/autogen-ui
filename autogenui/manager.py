@@ -4,7 +4,7 @@
 
 from typing import Dict
 import autogen,os
-import logging
+
 
 class Manager(object):
     def __init__(self) -> None:
@@ -13,11 +13,8 @@ class Manager(object):
 
     def run_flow(self, prompt: str, flow: str = "default") -> None:
         
-        openai_api_key = os.environ.get('OPENAI_API_KEY')
-        config_list = [{'model': 'gpt-4', 'api_key': openai_api_key },]
+        config_list = autogen.config_list_openai_aoai()
 
-        logging.info(f"OpenAI API Key: {openai_api_key}")
-        logging.info(f"Config List: {config_list}")
         llm_config = {
             "seed": 42,  # seed for caching and reproducibility
             "config_list": config_list,  # a list of OpenAI API configurations
