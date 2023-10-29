@@ -1,44 +1,55 @@
-# a manager class that can
-# load an autogen flow run an autogen flow and return the response to the client
+import json
+import os
+import autogen
+import logging
 
-
-from typing import Dict
-import autogen,os
-
+# Configuration du logger
+logging.basicConfig(level=logging.DEBUG)
 
 class Manager(object):
     def __init__(self) -> None:
+        self.config = self.load_config()
+        self.messages = self.load_messages()
 
-        pass
+    def load_config(self) -> dict:
+        try:
+            logging.debug('WorkDir A : ' + os.getcwd())
+            with open('/app/config/config.json', 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            logging.error("Le fichier 'config.json' est introuvable.")
+            return {}
+
+    def load_messages(self) -> dict:
+        try:
+            logging.debug('WorkDir B : ' + os.getcwd())
+            with open('/app/config/messages.json', 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            logging.error("Le fichier 'messages.json' est introuvable.")
+            return {}
 
     def run_flow(self, prompt: str, flow: str = "default") -> None:
-        
-        config_list = autogen.config_list_openai_aoai()
-
-        llm_config = {
-            "seed": 42,  # seed for caching and reproducibility
-            "config_list": config_list,  # a list of OpenAI API configurations
-            "temperature": 0,  # temperature for sampling
-            "use_cache": True,  # whether to use cache
-        }
+        logging.debug('WorkDir : ' + os.getcwd())
+        llm_config = self.config.get('llm_config', {})
+        llm_config['config_list'][0]['api_key'] = os.getenv('OPENAI_API_KEY')
 
         assistant = autogen.AssistantAgent(
             name="assistant",
-            system_message="Answer the question and then respond with TERMINATE to end the conversation. DO NOT write any code.",
-            llm_config=llm_config,)
+            system_message=self.messages.get('assistant_system_message', ''),
+            llm_config=llm_config,
+        )
 
-        # create a UserProxyAgent instance named "user_proxy"
+        user_proxy_config = self.config.get('user_proxy_config', {})
+        user_proxy_config['llm_config'] = llm_config
+        termination_msg = user_proxy_config.get('is_termination_msg', '')
+        user_proxy_config['is_termination_msg'] = lambda x: x.get("content", "").rstrip().endswith(termination_msg)
+
         user_proxy = autogen.UserProxyAgent(
             name="user_proxy",
-            human_input_mode="NEVER",
-            llm_config=llm_config,
-            max_consecutive_auto_reply=10,
-            is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
-            code_execution_config={
-                "work_dir": "scratch/coding",
-                "use_docker": False
-            },
+            **user_proxy_config
         )
+
         user_proxy.initiate_chat(
             assistant,
             message=prompt,

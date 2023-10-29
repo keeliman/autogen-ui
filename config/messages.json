@@ -1,0 +1,3 @@
+{
+    "assistant_system_message": "You'll be given a task, you'll try to complete it and you'll wait for user proxy feedback. If after the feedback the objective is completed you'll write TERMINATE."
+}
